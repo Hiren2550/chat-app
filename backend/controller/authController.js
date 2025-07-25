@@ -1,16 +1,17 @@
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/generateToken.js";
+import CustomError from "../utils/CustomErrorHandler.js";
 
-export const createuser = async (req, res) => {
+export const createuser = async (req, res, next) => {
   try {
     const { email, password, fullname, profile_image } = req.body;
     if (!email || !password || !fullname) {
-      return res.status(400).json({ message: "All fields are required" });
+      throw new CustomError("All fields are required", 400);
     }
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: "User already exists" });
+      throw new CustomError("User already exists", 400);
     }
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
@@ -23,45 +24,49 @@ export const createuser = async (req, res) => {
     if (newUser) {
       generateToken(newUser.id, res);
       await newUser.save();
-      res.status(201).json({
+      res.status(201);
+      res.locals.data = {
         email: newUser.email,
         fullname: newUser.fullname,
         profile_image: newUser.profile_image,
-      });
+      };
+      next();
     } else {
-      res.status(500).json({ message: "Failed to create user" });
+      throw new CustomError("Failed to create user", 500);
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 };
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      throw new CustomError("All fields are required", 400);
     }
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      throw new CustomError("User not found", 404);
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      throw new CustomError("Invalid credentials", 400);
     }
     generateToken(user.id, res);
-    res.status(200).json({
+    res.status(200);
+    res.locals.data = {
       email: user.email,
       fullname: user.fullname,
       profile_image: user.profile_image,
-    });
+    };
+    next();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-export const logoutUser = async (req, res) => {
+export const logoutUser = async (req, res, next) => {
   try {
     res.clearCookie("chat_token", {
       httpOnly: true,
@@ -69,8 +74,12 @@ export const logoutUser = async (req, res) => {
       sameSite: "strict",
       maxAge: 0,
     });
-    res.status(200).json({ message: "Logged out successfully" });
+    res.status(200);
+    res.locals.data = {
+      message: "Logged out successfully",
+    };
+    next();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

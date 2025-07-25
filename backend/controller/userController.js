@@ -1,10 +1,13 @@
 import User from "../models/user.js";
 
-export const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).select("-password");
-    res.status(200).json(users);
+    res.status(200);
+    res.locals.data = users;
+    res.locals.message = "Users retrieved successfully";
+    next();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

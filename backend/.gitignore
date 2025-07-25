@@ -57,3 +57,10 @@ dump/
 *.bak
 *.orig
 *.swp
+.env
+.env.*
+.env.development
+.env.production
+.env.test
+.env.local
+.env.development.local
