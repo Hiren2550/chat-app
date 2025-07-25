@@ -48,5 +48,5 @@ class ApiService {
 }
 
 // Export a default instance
-const api = new ApiService();
+const api = new ApiService(config.API_BASE_URL);
 export default api;

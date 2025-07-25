@@ -1,7 +1,7 @@
 export default function TermsPrivacy() {
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-10  flex flex-col text-gray-800">
-      <div className="m-2 flex gap-5 justify-center items-center">
+    <div className="max-w-4xl sm:mx-auto p-6 space-y-10 text-gray-800">
+      <div className="m-2 sm:flex gap-5 justify-center items-center">
         <section>
           <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
           <ul className="list-disc pl-6 space-y-2">

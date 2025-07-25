@@ -5,15 +5,23 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import TermsPrivacy from "./pages/TermsConditions";
 import TermsConditions from "./pages/TermsConditions";
+import PrivateRoute from "./components/features/PrivateRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/terms-privacy" element={<TermsConditions />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

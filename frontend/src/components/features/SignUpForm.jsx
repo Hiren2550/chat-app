@@ -7,6 +7,7 @@ import image from "@/assets/images/signup1.png";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
+import AuthApi from "@/api/auth";
 export function SignUpForm({ className, ...props }) {
   const {
     register,
@@ -18,10 +19,18 @@ export function SignUpForm({ className, ...props }) {
   } = useForm({
     defaultValues: { fullname: "", email: "", password: "" },
   });
-
+  const { createUser } = new AuthApi();
+  const [isLoading, setLoading] = useState(false);
   const onSubmit = async (data) => {
-    console.log(data);
-    // TODO: Call API to create user
+    setLoading(true);
+    try {
+      const createUserData = await createUser(data);
+      console.log(createUserData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
