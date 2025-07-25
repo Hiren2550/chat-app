@@ -1,13 +1,20 @@
-import { cn } from "@/lib/utils";
+import AuthApi from "@/api/auth";
+import image from "@/assets/images/login.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import image from "@/assets/images/login.png";
-import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { setUser } from "@/redux/auth/authSlice";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 
 export function LoginForm({ className, ...props }) {
+  const { login } = new AuthApi();
+
   const {
     register,
     getValues,
@@ -18,10 +25,23 @@ export function LoginForm({ className, ...props }) {
   } = useForm({
     defaultValues: { email: "", password: "" },
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  const onSubmit = (data) => {
-    // Your code to handle login goes here
-    console.log(data);
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await login(data);
+      if (response.success) {
+        dispatch(setUser(response.data));
+        toast.success(response?.message ?? "User Log In Successfully");
+      }
+    } catch (error) {
+      toast.error(error?.message ?? "Error while Login");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -39,6 +59,7 @@ export function LoginForm({ className, ...props }) {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  className={isLoading ? "bg-slate-200" : ""}
                   {...register("email", {
                     required: { value: true, message: "Email is required" },
                     pattern: {
@@ -66,6 +87,7 @@ export function LoginForm({ className, ...props }) {
                 </div>
                 <Input
                   id="password"
+                  className={isLoading ? "bg-slate-200" : ""}
                   {...register("password", {
                     required: { value: true, message: "Password is required" },
                     minLength: {
@@ -94,8 +116,13 @@ export function LoginForm({ className, ...props }) {
                   </p>
                 )}
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button
+                type="submit"
+                className={`w-full ${
+                  isLoading ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
+              >
+                {isLoading ? "Loading..." : "Login"}
               </Button>
               {/* <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-card text-muted-foreground relative z-10 px-2">
@@ -133,7 +160,15 @@ export function LoginForm({ className, ...props }) {
               </div> */}
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <Link to={"/signup"} className="underline underline-offset-4">
+                <Link
+                  to={isLoading ? "#" : "/signup"}
+                  className={`underline underline-offset-4 ${
+                    isLoading
+                      ? "pointer-events-none cursor-not-allowed text-gray-400"
+                      : ""
+                  }`}
+                  onClick={(e) => isLoading && e.preventDefault()}
+                >
                   Sign up
                 </Link>
               </div>

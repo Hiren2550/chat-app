@@ -61,6 +61,7 @@ export const loginUser = async (req, res, next) => {
       fullname: user.fullname,
       profile_image: user.profile_image,
     };
+    res.locals.message = "User Logged In Successfully";
     next();
   } catch (error) {
     next(error);

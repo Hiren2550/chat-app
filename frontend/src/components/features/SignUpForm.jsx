@@ -24,22 +24,21 @@ export function SignUpForm({ className, ...props }) {
     defaultValues: { fullname: "", email: "", password: "" },
   });
   const { createUser } = new AuthApi();
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const onSubmit = async (data) => {
-    toast.success("test success");
-    setLoading(true);
+    setIsLoading(true);
     try {
       const response = await createUser(data);
-      console.log(response, "signup form");
-      if (response.status) {
-        toast.success("test");
+      if (response.success) {
+        toast.success(response?.message ?? "New User Created Successfully");
         dispatch(setUser(response.data));
       }
     } catch (error) {
+      toast.error(error.message ?? "Error While Creating User");
       console.error(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
   return (
