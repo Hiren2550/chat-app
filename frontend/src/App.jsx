@@ -1,18 +1,28 @@
-import { useState } from "react";
-import Home from "./pages/Home";
-import SignUp from "./pages/SignUp";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "./pages/Login";
-import TermsPrivacy from "./pages/TermsConditions";
-import TermsConditions from "./pages/TermsConditions";
+import { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import PrivateRoute from "./components/features/PrivateRoute";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import TermsConditions from "./pages/TermsConditions";
+import { isLogin } from "./redux/auth/authSlice";
+import NotFound from "./pages/NotFound";
 
 function App() {
+  const isAuthenticated = useSelector(isLogin);
   return (
     <BrowserRouter>
+      <Toaster />
       <Routes>
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/signup"
+          element={isAuthenticated ? <Navigate to={"/"} /> : <SignUp />}
+        />
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to={"/"} /> : <Login />}
+        />
         <Route path="/terms-privacy" element={<TermsConditions />} />
         <Route
           path="/"
@@ -22,6 +32,8 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

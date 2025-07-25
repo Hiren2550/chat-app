@@ -1,11 +1,4 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "../redux/auth/authSlice";
-
 const Home = () => {
-  const user = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  console.log(user);
   return (
     <div>
       Home{" "}

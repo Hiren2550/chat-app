@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authReducer from "./auth/authSlice.js";
 import {
   persistStore,
@@ -10,20 +10,25 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
+import storage from "redux-persist/lib/storage";
 
+// Step 1: Combine reducers (even if you have only one for now)
+const rootReducer = combineReducers({
+  auth: authReducer,
+});
+
+// Step 2: Persist the rootReducer
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"], // only persist auth slice
+  whitelist: ["auth"], // Only persist the auth slice
 };
 
-const persistedReducer = persistReducer(persistConfig, authReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// Step 3: Create the store
 export const store = configureStore({
-  reducer: {
-    auth: persistedReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -32,4 +37,5 @@ export const store = configureStore({
     }),
 });
 
+// Step 4: Export persistor
 export const persistor = persistStore(store);

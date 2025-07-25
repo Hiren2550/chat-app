@@ -1,19 +1,23 @@
-import { cn } from "@/lib/utils";
+import AuthApi from "@/api/auth";
+import image from "@/assets/images/signup1.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import image from "@/assets/images/signup1.png";
-import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { setUser } from "@/redux/auth/authSlice";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
-import AuthApi from "@/api/auth";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 export function SignUpForm({ className, ...props }) {
   const {
     register,
     getValues,
     setValue,
     control,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -21,11 +25,17 @@ export function SignUpForm({ className, ...props }) {
   });
   const { createUser } = new AuthApi();
   const [isLoading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const onSubmit = async (data) => {
+    toast.success("test success");
     setLoading(true);
     try {
-      const createUserData = await createUser(data);
-      console.log(createUserData);
+      const response = await createUser(data);
+      console.log(response, "signup form");
+      if (response.status) {
+        toast.success("test");
+        dispatch(setUser(response.data));
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -47,6 +57,7 @@ export function SignUpForm({ className, ...props }) {
               <div className="grid gap-3">
                 <Label htmlFor="fullname">Full Name</Label>
                 <Input
+                  className={isLoading ? "bg-slate-200" : ""}
                   {...register("fullname", {
                     required: { value: true, message: "Full Name is required" },
                   })}
@@ -54,12 +65,14 @@ export function SignUpForm({ className, ...props }) {
                   type="text"
                   placeholder="Enter Full Name"
                   required
+                  disabled={isLoading}
                 />
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  className={isLoading ? "bg-slate-200" : ""}
                   {...register("email", {
                     required: { value: true, message: "Email is required" },
                     pattern: {
@@ -81,6 +94,7 @@ export function SignUpForm({ className, ...props }) {
                 </div>
                 <Input
                   id="password"
+                  className={isLoading ? "bg-slate-200" : ""}
                   {...register("password", {
                     required: { value: true, message: "Password is required" },
                     minLength: {
@@ -109,8 +123,13 @@ export function SignUpForm({ className, ...props }) {
                   </p>
                 )}
               </div>
-              <Button type="submit" className="w-full">
-                Sign Up
+              <Button
+                type="submit"
+                className={`w-full ${
+                  isLoading ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
+              >
+                {isLoading ? "Loading..." : "Sign Up"}
               </Button>
               {/* <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-card text-muted-foreground relative z-10 px-2">
@@ -148,7 +167,15 @@ export function SignUpForm({ className, ...props }) {
               </div> */}
               <div className="text-center text-sm">
                 Have an account?{" "}
-                <Link to={"/login"} className="underline underline-offset-4">
+                <Link
+                  to={isLoading ? "#" : "/login"}
+                  className={`underline underline-offset-4 ${
+                    isLoading
+                      ? "pointer-events-none cursor-not-allowed text-gray-400"
+                      : ""
+                  }`}
+                  onClick={(e) => isLoading && e.preventDefault()}
+                >
                   Login
                 </Link>
               </div>

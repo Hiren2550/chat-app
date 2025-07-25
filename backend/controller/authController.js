@@ -30,6 +30,7 @@ export const createuser = async (req, res, next) => {
         fullname: newUser.fullname,
         profile_image: newUser.profile_image,
       };
+      res.locals.message = "New User Created Successfully";
       next();
     } else {
       throw new CustomError("Failed to create user", 500);

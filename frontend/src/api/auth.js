@@ -8,9 +8,28 @@ class AuthApi {
   async createUser(user) {
     try {
       const response = await api.post(AuthApi.API_END_POINT.Login, user);
-      return response.data;
+      const res = response?.data;
+      if (res?.status === 201) {
+        console.log(response, "201---------------");
+        return {
+          message: res?.message ?? "User Created Succesfully",
+          data: res?.result ?? [],
+          status: res?.status,
+          success: res?.success || true,
+        };
+      } else {
+        console.log(res, "!!!201----------");
+        return {
+          message: res?.message ?? "Error while Creating New User",
+          status: res?.status,
+          success: res?.success || false,
+        };
+      }
     } catch (error) {
-      throw new Error("Failed to create user");
+      return {
+        message: error?.message,
+        error: error,
+      };
     }
   }
 }
