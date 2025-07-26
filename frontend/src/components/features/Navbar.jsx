@@ -9,6 +9,7 @@ import { IoIosLogOut } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "@/assets/images/logo.png";
 
 export default function Navbar() {
   const { logOut } = new AuthApi();
@@ -52,9 +53,12 @@ export default function Navbar() {
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <nav className="mx-auto flex items-center justify-between p-4 max-w-7xl">
-        <Link to="/" className="text-xl font-bold text-primary">
-          Chat App
-        </Link>
+        <div className="flex items-center gap-2">
+          <img src={logo} alt="logo" className="w-8 h-8" />
+          <Link to="/" className="text-xl font-bold text-primary">
+            Chat App
+          </Link>
+        </div>
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex gap-6 text-sm font-medium">
