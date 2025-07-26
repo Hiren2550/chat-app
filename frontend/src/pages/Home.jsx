@@ -1,12 +1,11 @@
 import Navbar from "@/components/features/Navbar";
-import { clearUser } from "@/redux/auth/authSlice";
-import { useDispatch } from "react-redux";
+import Sidebar from "@/components/features/Sidebar";
 
 const Home = () => {
-  const dispatch = useDispatch();
   return (
     <div>
       <Navbar />
+      <Sidebar />
     </div>
   );
 };

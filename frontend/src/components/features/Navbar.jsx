@@ -45,8 +45,8 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { name: "Profile", path: "/profile", icon: <FaRegUserCircle /> },
-    { name: "Logout", path: "/logout", icon: <IoIosLogOut /> },
+    { name: "Profile", path: "/profile", icon: <FaRegUserCircle size={24} /> },
+    { name: "Logout", path: "/logout", icon: <IoIosLogOut size={24} /> },
   ];
 
   return (
@@ -76,8 +76,8 @@ export default function Navbar() {
                 className="text-gray-700 hover:text-black transition-colors duration-200"
               >
                 <div className="flex gap-1  items-center text-lg">
-                  <span>{link.name}</span>
                   <span>{link?.icon}</span>
+                  <span>{link.name}</span>
                 </div>
               </Link>
             </li>
