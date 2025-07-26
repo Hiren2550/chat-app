@@ -1,22 +1,23 @@
 import { cn } from "@/lib/utils";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "../ui/card";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "../ui/button";
 import placeholder from "@/assets/images/placeholder.png";
 import { IoCameraOutline } from "react-icons/io5";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import toast from "react-hot-toast";
 import UserApi from "@/api/user";
 import { setUser, user } from "@/redux/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
+import { Input } from "../ui/input";
 
 const ProfileForm = ({ className, ...props }) => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
   const { updateUserData } = new UserApi();
@@ -26,8 +27,13 @@ const ProfileForm = ({ className, ...props }) => {
   const [base64URL, setBase64URL] = useState("");
   const dispatch = useDispatch();
   const userDetails = useSelector(user);
-  console.log(userDetails);
-
+  useEffect(() => {
+    if (userDetails) {
+      reset({
+        fullname: userDetails?.fullname,
+      });
+    }
+  }, [userDetails]);
   const handleFileChange = (e) => {
     const imageFile = e.target.files[0];
     setFile(imageFile);
@@ -43,14 +49,15 @@ const ProfileForm = ({ className, ...props }) => {
     reader.onerror = (error) => {};
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (data) => {
     if (!base64URL) return alert("No image selected");
-    let data = {
+    let updatedata = {
       image: base64URL,
+      fullname: data?.fullname,
     };
     setIsLoading(true);
     try {
-      const response = await updateUserData(data);
+      const response = await updateUserData(updatedata);
       if (response.success) {
         dispatch(setUser(response.data));
         toast.success(response?.message ?? "User Data updated Successfully");
@@ -105,7 +112,7 @@ const ProfileForm = ({ className, ...props }) => {
                     />
                   </div>
                 </div>
-                <div className="grid gap-2">
+                {/* <div className="grid gap-2">
                   <Label htmlFor="fullname" className="mx-1">
                     Full Name
                   </Label>
@@ -115,6 +122,28 @@ const ProfileForm = ({ className, ...props }) => {
                   >
                     {userDetails?.fullname}
                   </p>
+                </div> */}
+                <div className="grid gap-3">
+                  <Label htmlFor="fullname">Full Name</Label>
+                  <Input
+                    className={isLoading ? "bg-slate-200" : ""}
+                    {...register("fullname", {
+                      required: {
+                        value: true,
+                        message: "Full Name is required",
+                      },
+                    })}
+                    id="fullname"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="Enter Full Name"
+                    disabled={isLoading}
+                  />
+                  {errors.fullname && (
+                    <p className="text-red-500 text-xs">
+                      {errors.fullname.message}
+                    </p>
+                  )}
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email" className="mx-1">

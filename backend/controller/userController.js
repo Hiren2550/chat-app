@@ -17,19 +17,22 @@ export const getAllUsers = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
   try {
     const file = req.body.image; // Base64 or file URL
+    const fullname = req.body.fullname;
     if (!file) {
       throw new CustomError("Image is not provided", 400);
     }
     const uploadRes = await cloudinary.uploader.upload(file, {
       folder: "uploads",
     });
-    const updatedData = await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        profile_image: uploadRes.secure_url,
-      },
-      { new: true }
-    ).select("-password");
+    let payload = {
+      profile_image: uploadRes.secure_url,
+    };
+    if (fullname) {
+      payload = { ...payload, fullname };
+    }
+    const updatedData = await User.findByIdAndUpdate(req.user.id, payload, {
+      new: true,
+    }).select("-password");
     res.status(200);
     res.locals.data = updatedData;
     res.locals.message = "User Data Updated Successfully";
