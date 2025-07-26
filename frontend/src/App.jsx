@@ -2,14 +2,14 @@ import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import PrivateRoute from "./components/features/PrivateRoute";
+import About from "./pages/About";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import SignUp from "./pages/SignUp";
 import TermsConditions from "./pages/TermsConditions";
 import { isLogin } from "./redux/auth/authSlice";
-import NotFound from "./pages/NotFound";
-import Profile from "./pages/Profile";
-import About from "./pages/About";
 
 function App() {
   const isAuthenticated = useSelector(isLogin);

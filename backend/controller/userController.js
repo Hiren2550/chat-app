@@ -20,15 +20,15 @@ export const updateUser = async (req, res, next) => {
   try {
     const file = req.body.image; // Base64 or file URL
     const fullname = req.body.fullname;
-    if (!file) {
-      throw new CustomError("Image is not provided", 400);
+    let payload;
+    if (file) {
+      const uploadRes = await cloudinary.uploader.upload(file, {
+        folder: "uploads",
+      });
+      payload = {
+        profile_image: uploadRes.secure_url,
+      };
     }
-    const uploadRes = await cloudinary.uploader.upload(file, {
-      folder: "uploads",
-    });
-    let payload = {
-      profile_image: uploadRes.secure_url,
-    };
     if (fullname) {
       payload = { ...payload, fullname };
     }

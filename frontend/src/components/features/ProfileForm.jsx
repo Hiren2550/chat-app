@@ -50,14 +50,15 @@ const ProfileForm = ({ className, ...props }) => {
   };
 
   const handleUpdate = async (data) => {
-    if (!base64URL) return alert("No image selected");
-    let updatedata = {
-      image: base64URL,
+    let updateData = {
       fullname: data?.fullname,
     };
+    if (base64URL) {
+      updateData = { ...updateData, image: base64URL };
+    }
     setIsLoading(true);
     try {
-      const response = await updateUserData(updatedata);
+      const response = await updateUserData(updateData);
       if (response.success) {
         dispatch(setUser(response.data));
         toast.success(response?.message ?? "User Data updated Successfully");

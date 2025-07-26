@@ -5,6 +5,7 @@ class AuthApi {
     SIGN_UP: "/auth/signup",
     LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
+    CHECK_AUTH: "/auth/check-auth",
   };
 
   async createUser(user) {
@@ -76,6 +77,34 @@ class AuthApi {
       } else {
         return {
           message: res?.message ?? "Error while Logout User",
+          status: res?.status,
+          success: res?.success || false,
+        };
+      }
+    } catch (error) {
+      return {
+        message: error?.response?.data?.message || error.message,
+        status: error?.response?.status,
+        error: error?.response?.data,
+        success: false,
+      };
+    }
+  }
+
+  async checkAuth() {
+    try {
+      const response = await api.post(AuthApi.API_END_POINT.CHECK_AUTH);
+      const res = response?.data;
+      if (res?.status === 200) {
+        return {
+          message: res?.message ?? "User Authenticated Succesfully",
+          data: res?.result ?? [],
+          status: res?.status,
+          success: res?.success || true,
+        };
+      } else {
+        return {
+          message: res?.message ?? "Error while Check Auth",
           status: res?.status,
           success: res?.success || false,
         };

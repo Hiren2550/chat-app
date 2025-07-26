@@ -1,6 +1,7 @@
-// src/api/ApiService.js
 import axios from "axios";
 import { config } from "../helper/config";
+import { store } from "@/redux/store";
+import { clearUser } from "@/redux/auth/authSlice";
 
 class ApiService {
   constructor(baseURL = config.API_BASE_URL) {
@@ -8,28 +9,35 @@ class ApiService {
       baseURL,
       withCredentials: true,
     });
+    // Add interceptor for response
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          store.dispatch(clearUser());
+          return Promise.reject({
+            ...error,
+            message: "Unauthorized access - Logging out.",
+          });
+        }
+
+        return Promise.reject(error);
+      }
+    );
   }
 
-  /**
-   * General method to make any API call.
-   * @param {string} method - HTTP method (get, post, put, delete)
-   * @param {string} url - API endpoint (e.g., "/users")
-   * @param {object} options - { params, data, headers }
-   * @returns {Promise}
-   */
   request(method, url, options = {}) {
     const { params = {}, data = {}, headers = {} } = options;
 
     return this.client.request({
       method,
       url,
-      params, // Query string params
-      data, // Request body
+      params,
+      data,
       headers,
     });
   }
 
-  // Shorthand methods
   get(url, params = {}, headers = {}) {
     return this.request("get", url, { params, headers });
   }
@@ -47,6 +55,5 @@ class ApiService {
   }
 }
 
-// Export a default instance
 const api = new ApiService(config.API_BASE_URL);
 export default api;
