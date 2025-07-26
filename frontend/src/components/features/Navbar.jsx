@@ -45,7 +45,7 @@ export default function Navbar() {
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
-    { name: "Profile", path: "/profie", icon: <FaRegUserCircle /> },
+    { name: "Profile", path: "/profile", icon: <FaRegUserCircle /> },
     { name: "Logout", path: "/logout", icon: <IoIosLogOut /> }, // Logout will use custom logic
   ];
 

@@ -8,6 +8,7 @@ import SignUp from "./pages/SignUp";
 import TermsConditions from "./pages/TermsConditions";
 import { isLogin } from "./redux/auth/authSlice";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 function App() {
   const isAuthenticated = useSelector(isLogin);
@@ -29,6 +30,14 @@ function App() {
           element={
             <PrivateRoute>
               <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
             </PrivateRoute>
           }
         />
