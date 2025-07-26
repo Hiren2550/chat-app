@@ -4,7 +4,9 @@ import CustomError from "../utils/CustomErrorHandler.js";
 
 export const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find({}).select("-password");
+    const users = await User.find({ _id: { $ne: req.user.id } }).select(
+      "-password"
+    );
     res.status(200);
     res.locals.data = users;
     res.locals.message = "Users retrieved successfully";

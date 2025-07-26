@@ -4,6 +4,6 @@ import { privateRoute } from "../middlewares/privateRoute.js";
 
 const router = express.Router();
 
-router.get("/", getAllUsers);
+router.get("/", privateRoute, getAllUsers);
 router.post("/update", privateRoute, updateUser);
 export default router;

@@ -101,7 +101,7 @@ const ProfileForm = ({ className, ...props }) => {
                   />
                   <img
                     className="rounded-full border-gray-300 h-28 w-28 object-cover self-center mt-2 mx-auto"
-                    src={userDetails?.profile_image || base64URL || placeholder}
+                    src={base64URL || userDetails?.profile_image || placeholder}
                     alt="Profile"
                   />
                   <div className="absolute bottom-1/8 right-3/8 p-2 rounded-full cursor-pointer bg-slate-600 border border-gray-800">
