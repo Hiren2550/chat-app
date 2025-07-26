@@ -76,10 +76,21 @@ export const logoutUser = async (req, res, next) => {
       sameSite: "strict",
       maxAge: 0,
     });
+    res.locals.message = "Logged out successfully";
     res.status(200);
-    res.locals.data = {
-      message: "Logged out successfully",
-    };
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkAuth = (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new CustomError("User not authenticated", 401);
+    }
+    res.locals.data = req.user;
+    res.locals.message = "User is authenticated successfully";
     next();
   } catch (error) {
     next(error);

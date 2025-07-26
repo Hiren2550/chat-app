@@ -33,21 +33,30 @@ export function LoginForm({ className, ...props }) {
     try {
       const response = await login(data);
       if (response.success) {
+        toast.success(response?.message ?? "User Logged In Successfully");
         dispatch(setUser(response.data));
-        toast.success(response?.message ?? "User Log In Successfully");
+      } else {
+        toast.error(response.message ?? "Error While Login");
       }
     } catch (error) {
       toast.error(error?.message ?? "Error while Login");
-      console.error(error);
+      // console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div
+      className={cn("flex flex-col gap-6 select-none", className)}
+      {...props}
+    >
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="p-6 md:p-8"
+            noValidate
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -68,8 +77,8 @@ export function LoginForm({ className, ...props }) {
                     },
                   })}
                   type="email"
+                  autoComplete="off"
                   placeholder="Enter Email Id"
-                  required
                 />
                 {errors.email && (
                   <p className="text-red-500 text-xs">{errors.email.message}</p>
@@ -78,36 +87,21 @@ export function LoginForm({ className, ...props }) {
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
+                  {/* <a
                     href="#"
                     className="ml-auto text-sm underline-offset-2 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </a> */}
                 </div>
                 <Input
                   id="password"
                   className={isLoading ? "bg-slate-200" : ""}
                   {...register("password", {
                     required: { value: true, message: "Password is required" },
-                    minLength: {
-                      value: 8,
-                      message: "Password must be at least 8 characters long",
-                    },
-                    maxLength: {
-                      value: 16,
-                      message: "Password must be at most 16 characters long",
-                    },
-                    pattern: {
-                      value:
-                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                      message:
-                        "Password must include uppercase, lowercase, number, and special character",
-                    },
                   })}
                   autoComplete="off"
                   type="password"
-                  required
                   placeholder="Enter Password"
                 />
                 {errors.password && (

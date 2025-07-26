@@ -3,8 +3,10 @@ export default function TermsPrivacy() {
     <div className="max-w-4xl sm:mx-auto p-6 space-y-10 text-gray-800">
       <div className="m-2 sm:flex gap-5 justify-center items-center">
         <section>
-          <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
-          <ul className="list-disc pl-6 space-y-2">
+          <h1 className="text-3xl font-bold mb-4 select-none">
+            Privacy Policy
+          </h1>
+          <ul className="list-disc pl-6 space-y-2 select-none">
             <li>
               We collect minimal personal information to provide services.
             </li>
@@ -19,8 +21,10 @@ export default function TermsPrivacy() {
           </ul>
         </section>
         <section>
-          <h1 className="text-3xl font-bold mb-4">Terms of Service</h1>
-          <ul className="list-disc pl-6 space-y-2">
+          <h1 className="text-3xl font-bold mb-4 select-none">
+            Terms of Service
+          </h1>
+          <ul className="list-disc pl-6 space-y-2 select-none">
             <li>By using this app, you agree to these terms.</li>
             <li>You must be 13+ to register or use this service.</li>
             <li>You’re responsible for your account and password.</li>

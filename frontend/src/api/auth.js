@@ -4,6 +4,7 @@ class AuthApi {
   static API_END_POINT = {
     SIGN_UP: "/auth/signup",
     LOGIN: "/auth/login",
+    LOGOUT: "/auth/logout",
   };
 
   async createUser(user) {
@@ -26,8 +27,10 @@ class AuthApi {
       }
     } catch (error) {
       return {
-        message: error?.message,
-        error: error,
+        message: error?.response?.data?.message || error.message,
+        status: error?.response?.status,
+        error: error?.response?.data,
+        success: false,
       };
     }
   }
@@ -51,8 +54,38 @@ class AuthApi {
       }
     } catch (error) {
       return {
-        message: error?.message,
-        error: error,
+        message: error?.response?.data?.message || error.message,
+        status: error?.response?.status,
+        error: error?.response?.data,
+        success: false,
+      };
+    }
+  }
+
+  async logOut() {
+    try {
+      const response = await api.post(AuthApi.API_END_POINT.LOGOUT);
+      const res = response?.data;
+      if (res?.status === 200) {
+        return {
+          message: res?.message ?? "User Logou Succesfully",
+          data: res?.result ?? [],
+          status: res?.status,
+          success: res?.success || true,
+        };
+      } else {
+        return {
+          message: res?.message ?? "Error while Logout User",
+          status: res?.status,
+          success: res?.success || false,
+        };
+      }
+    } catch (error) {
+      return {
+        message: error?.response?.data?.message || error.message,
+        status: error?.response?.status,
+        error: error?.response?.data,
+        success: false,
       };
     }
   }

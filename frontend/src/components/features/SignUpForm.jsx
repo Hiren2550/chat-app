@@ -14,9 +14,6 @@ import { Link } from "react-router-dom";
 export function SignUpForm({ className, ...props }) {
   const {
     register,
-    getValues,
-    setValue,
-    control,
     reset,
     handleSubmit,
     formState: { errors },
@@ -33,19 +30,28 @@ export function SignUpForm({ className, ...props }) {
       if (response.success) {
         toast.success(response?.message ?? "New User Created Successfully");
         dispatch(setUser(response.data));
+      } else {
+        toast.error(response.message ?? "Error While Creating User");
       }
     } catch (error) {
       toast.error(error.message ?? "Error While Creating User");
-      console.error(error);
+      // console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div
+      className={cn("flex flex-col gap-6 select-none", className)}
+      {...props}
+    >
       <Card className="overflow-hidden p-0">
-        <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8" onSubmit={handleSubmit(onSubmit)}>
+        <CardContent className="grid p-0 md:grid-cols-2 ">
+          <form
+            noValidate
+            className="p-6 md:p-8"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome To Our Website</h1>
@@ -62,15 +68,21 @@ export function SignUpForm({ className, ...props }) {
                   })}
                   id="fullname"
                   type="text"
+                  autoComplete="off"
                   placeholder="Enter Full Name"
-                  required
                   disabled={isLoading}
                 />
+                {errors.fullname && (
+                  <p className="text-red-500 text-xs">
+                    {errors.fullname.message}
+                  </p>
+                )}
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  autoComplete="off"
                   className={isLoading ? "bg-slate-200" : ""}
                   {...register("email", {
                     required: { value: true, message: "Email is required" },
@@ -81,7 +93,6 @@ export function SignUpForm({ className, ...props }) {
                   })}
                   type="email"
                   placeholder="Enter Email Id"
-                  required
                 />
                 {errors.email && (
                   <p className="text-red-500 text-xs">{errors.email.message}</p>
@@ -113,7 +124,6 @@ export function SignUpForm({ className, ...props }) {
                   })}
                   autoComplete="off"
                   type="password"
-                  required
                   placeholder="Enter Password"
                 />
                 {errors.password && (
