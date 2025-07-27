@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  selectedUser: null,
+  selectedUser: {},
+  onlineUserList: ["6884e1ae363544fb040de3c6"],
 };
 
 const userSlice = createSlice({
@@ -16,4 +17,5 @@ const userSlice = createSlice({
 
 export const { setSelectedUser } = userSlice.actions;
 export const selectedUser = (state) => state.user.selectedUser;
+export const onlineUsers = (state) => state.user.onlineUserList;
 export default userSlice.reducer;

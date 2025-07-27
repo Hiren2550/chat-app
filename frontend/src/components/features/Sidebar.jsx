@@ -5,7 +5,12 @@ import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { SidebarSkeleton } from "../skeletons/SidebarSkeleton";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedUser, setSelectedUser } from "@/redux/user/userSlice";
+import {
+  onlineUsers,
+  selectedUser,
+  setSelectedUser,
+} from "@/redux/user/userSlice";
+import { PiUserListLight } from "react-icons/pi";
 
 const Sidebar = ({ isOpen }) => {
   const { getUsersList } = new UserApi();
@@ -13,6 +18,7 @@ const Sidebar = ({ isOpen }) => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const chatUser = useSelector(selectedUser);
+  const onlineUserList = useSelector(onlineUsers);
 
   const fetchUserList = async () => {
     setIsLoading(true);
@@ -45,8 +51,9 @@ const Sidebar = ({ isOpen }) => {
         isOpen ? "translate-x-0" : "-translate-x-full"
       } transition-transform duration-300 ease-in-out w-80 z-40 md:translate-x-0 overflow-y-auto h-full hide-scrollbar`}
     >
-      <div className="p-4 text-xl font-bold border-b border-gray-300">
-        <h2>All Contacts</h2>
+      <div className="p-4 text-xl font-bold border-b border-gray-300 flex gap-2 items-center">
+        <PiUserListLight size={30} className="font-bold" />
+        <h2>Contacts</h2>
       </div>
 
       {/* Chat Users List */}
@@ -58,11 +65,14 @@ const Sidebar = ({ isOpen }) => {
             <Link
               key={user.id}
               // to={`/chat/${user.id}`}
-              onClick={() => dispatch(setSelectedUser(user?.id))}
-              className={`flex items-center gap-3 p-2 rounded transition ${
-                chatUser === user.id ? "bg-gray-200" : ""
+              onClick={() => dispatch(setSelectedUser(user))}
+              className={`relative flex items-center gap-3 p-2 rounded transition hover:bg-[#bbc9e8] ${
+                chatUser?.id === user.id ? "bg-[#b7c7e8]" : ""
               }`}
             >
+              {onlineUserList?.includes(user.id) && (
+                <span className="absolute top-3 left-10 size-2 rounded-full bg-green-600" />
+              )}
               <img
                 src={
                   user?.profile_image ||
@@ -83,7 +93,7 @@ const Sidebar = ({ isOpen }) => {
                   {user.fullname}
                 </span>
                 <span className="text-xs text-gray-500 truncate max-w-[140px]">
-                  {user.lastMessage || "Offline"}
+                  {onlineUserList?.includes(user.id) ? "Online" : "Offline"}
                 </span>
                 <span className="text-sm text-gray-500 truncate max-w-[140px]">
                   {user.lastMessage}

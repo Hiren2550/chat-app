@@ -29,6 +29,7 @@ export const createuser = async (req, res, next) => {
         email: newUser.email,
         fullname: newUser.fullname,
         profile_image: newUser.profile_image,
+        id: newUser?.id,
       };
       res.locals.message = "New User Created Successfully";
       next();
@@ -60,6 +61,7 @@ export const loginUser = async (req, res, next) => {
       email: user.email,
       fullname: user.fullname,
       profile_image: user.profile_image,
+      id: user.id,
     };
     res.locals.message = "User Logged In Successfully";
     next();
