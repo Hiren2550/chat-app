@@ -12,8 +12,8 @@ export const getMessagesById = async (req, res, next) => {
       ],
     })
       .sort({ createdAt: 1 })
-      .populate("senderId")
-      .populate("receiverId");
+      .populate("senderId", "-password")
+      .populate("receiverId", "-password");
 
     res.status(200);
     res.locals.data = messages;

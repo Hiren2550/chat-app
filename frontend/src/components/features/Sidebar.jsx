@@ -4,11 +4,15 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { SidebarSkeleton } from "../skeletons/SidebarSkeleton";
+import { useDispatch, useSelector } from "react-redux";
+import { selectedUser, setSelectedUser } from "@/redux/user/userSlice";
 
 const Sidebar = ({ isOpen }) => {
   const { getUsersList } = new UserApi();
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const chatUser = useSelector(selectedUser);
 
   const fetchUserList = async () => {
     setIsLoading(true);
@@ -54,12 +58,25 @@ const Sidebar = ({ isOpen }) => {
             <Link
               key={user.id}
               // to={`/chat/${user.id}`}
-              className="flex items-center gap-3 p-2 rounded hover:bg-gray-200 transition"
+              onClick={() => dispatch(setSelectedUser(user?.id))}
+              className={`flex items-center gap-3 p-2 rounded transition ${
+                chatUser === user.id ? "bg-gray-200" : ""
+              }`}
             >
               <img
-                src={user?.profile_image || placeholder}
+                src={
+                  user?.profile_image ||
+                  `https://placehold.co/800x800?text=${user?.fullname
+                    .charAt(0)
+                    .toUpperCase()}` ||
+                  placeholder
+                }
                 alt="avatar"
                 className="w-10 h-10 rounded-full"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = placeholder;
+                }}
               />
               <div className="flex flex-col">
                 <span className="font-medium text-sm text-gray-800">
