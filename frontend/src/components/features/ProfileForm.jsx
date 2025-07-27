@@ -12,6 +12,7 @@ import { setUser, user } from "@/redux/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { Input } from "../ui/input";
+import { convertToBase64 } from "@/helper/convertToBase64";
 
 const ProfileForm = ({ className, ...props }) => {
   const {
@@ -37,16 +38,7 @@ const ProfileForm = ({ className, ...props }) => {
   const handleFileChange = (e) => {
     const imageFile = e.target.files[0];
     setFile(imageFile);
-    convertToBase64(imageFile);
-  };
-
-  const convertToBase64 = (file) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      setBase64URL(reader.result);
-    };
-    reader.onerror = (error) => {};
+    convertToBase64(imageFile, setBase64URL);
   };
 
   const handleUpdate = async (data) => {

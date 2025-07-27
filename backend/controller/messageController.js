@@ -37,12 +37,18 @@ export const createMessage = async (req, res, next) => {
       throw new CustomError("Message must contain text or image", 400);
     }
 
-    const newMessage = await Message.create({
-      senderId,
+    const messageData = {
       receiverId,
-      text: text?.trim() || "",
-      image: image || "",
-    });
+      senderId,
+      ...(typeof text === "string" && text.trim() !== ""
+        ? { text: text.trim() }
+        : {}),
+      ...(typeof image === "string" && image.trim() !== ""
+        ? { image: image.trim() }
+        : {}),
+    };
+
+    const newMessage = await Message.create(messageData);
     res.status(201);
     res.locals.data = newMessage;
     res.locals.message = "Message sent successfully";

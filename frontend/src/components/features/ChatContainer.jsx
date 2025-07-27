@@ -9,21 +9,31 @@ import EmptyChatPlaceholder from "./EmptyChatPlaceholder";
 import ChatContainerSkeleton from "../skeletons/ChatContainerSkeleton";
 import { user } from "@/redux/auth/authSlice";
 import moment from "moment";
+import { convertToBase64 } from "@/helper/convertToBase64";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import { MessageTimestamp } from "./MessageTimestamp";
 
 const ChatContainer = () => {
-  const { getMessageByUserId } = new MessageApi();
+  const { getMessageByUserId, sendMesssage } = new MessageApi();
   const chatUser = useSelector(selectedUser);
   const authUser = useSelector(user);
-  console.log("authUser:", authUser);
-  console.log("chatUser:", chatUser);
-
-  const [messages, setMessages] = useState([
-    // { id: 1, text: "Hey! How are you?", from: "other" },
-    // { id: 2, text: "I'm good, thanks! You?", from: "me" },
-  ]);
+  const authPlaceHolder = `https://placehold.co/800x800?text=${authUser?.fullname
+    .charAt(0)
+    .toUpperCase()}`;
+  const chatPlaceHolder = `https://placehold.co/800x800?text=${chatUser?.fullname
+    .charAt(0)
+    .toUpperCase()}`;
+  const testPlaceHolder = `https://placehold.co/800x800?text=${"Test"
+    .charAt(0)
+    .toUpperCase()}`;
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const fileRef = useRef(null);
+  const [file, setFile] = useState(undefined);
+  const [base64URL, setBase64URL] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
   const handleFetchChatMessages = async (id) => {
     setIsLoading(true);
     try {
@@ -39,13 +49,32 @@ const ChatContainer = () => {
       setIsLoading(false);
     }
   };
-  const handleSend = () => {
-    if (input.trim() === "") return;
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), text: input.trim(), from: "me" },
-    ]);
-    setInput("");
+  const handleSend = async () => {
+    if (input.trim() === "" && !base64URL) return;
+    const messageData = {
+      receiverId: chatUser?.id,
+    };
+    if (input.trim() !== "") {
+      messageData.text = input;
+    }
+    if (base64URL) {
+      messageData.image = base64URL;
+    }
+    setIsLoading(true);
+    try {
+      const response = await sendMesssage(messageData);
+      if (response.success) {
+        setBase64URL("");
+        setInput("");
+        handleFetchChatMessages(chatUser?.id);
+      } else {
+        toast.error(response.message ?? "Error While Sending Messages");
+      }
+    } catch (error) {
+      toast.error(error?.message ?? "Error while Sending Messages");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -53,6 +82,12 @@ const ChatContainer = () => {
       e.preventDefault();
       handleSend();
     }
+  };
+  const handleFileChange = (e) => {
+    const imageFile = e.target.files[0];
+    setFile(imageFile);
+    convertToBase64(imageFile, setBase64URL);
+    setDisabled(false);
   };
 
   useEffect(() => {
@@ -75,12 +110,7 @@ const ChatContainer = () => {
           <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-white">
             <div className="flex items-center gap-3">
               <img
-                src={
-                  chatUser?.profile_image ||
-                  `https://placehold.co/800x800?text=${chatUser?.fullname
-                    .charAt(0)
-                    .toUpperCase()}`
-                }
+                src={chatUser?.profile_image || chatPlaceHolder}
                 alt="User"
                 className="w-10 h-10 rounded-full"
                 onError={(e) => {
@@ -113,21 +143,75 @@ const ChatContainer = () => {
                 return (
                   <div
                     key={msg.id}
-                    className={`flex gap-1 ${
+                    className={`flex gap-1 items-end ${
                       isSentByMe ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <div
-                      className={`relative min-w-[50px] ${
-                        isSentByMe ? "bg-green-200" : "bg-white"
-                      } p-3 rounded-lg shadow text-base max-w-[80%]`}
-                    >
-                      {msg.text}
-                      <span className="text-[9px] absolute bottom-0 right-1.5">
-                        {msg?.createdAt &&
-                          moment(msg.createdAt).format("HH:mm")}
-                      </span>
-                    </div>
+                    {/* For received messages, show image on the left */}
+                    {!isSentByMe && (
+                      <img
+                        src={msg?.senderId?.profile_image || chatPlaceHolder}
+                        alt="profile"
+                        className="w-6 h-6 rounded-full"
+                      />
+                    )}
+
+                    {msg.text && !msg.image && (
+                      <div
+                        className={`relative min-w-[50px] ${
+                          isSentByMe ? "bg-green-200" : "bg-white"
+                        } py-1.5 px-2 pb-2 rounded-lg shadow text-base max-w-[80%] break-words`}
+                      >
+                        <span className="break-all">{msg.text}</span>
+                        <span className="text-[8px] absolute bottom-0 right-1.5">
+                          <MessageTimestamp date={msg.createdAt} />
+                        </span>
+                      </div>
+                    )}
+
+                    {msg.image && !msg.text && (
+                      <div
+                        className={`relative min-w-[50px] ${
+                          isSentByMe ? "bg-green-200" : "bg-white"
+                        } py-2 px-2 pb-4 rounded-lg shadow text-base max-w-[80%]`}
+                      >
+                        <img
+                          src={msg?.image || authPlaceHolder}
+                          alt="profile"
+                          className="w-[150px] h-[150px] rounded-lg"
+                        />
+                        <span className="text-[8px] absolute bottom-0 right-1.5">
+                          <MessageTimestamp date={msg.createdAt} />
+                        </span>
+                      </div>
+                    )}
+
+                    {msg.text && msg.image && (
+                      <div
+                        className={`relative min-w-[50px] ${
+                          isSentByMe ? "bg-green-200" : "bg-white"
+                        } py-1.5 px-2 pb-4 rounded-lg shadow text-base max-w-[80%] break-words`}
+                      >
+                        <img
+                          src={msg.image}
+                          alt="sent"
+                          className="w-full max-w-xs h-auto rounded-md mb-2"
+                        />
+                        <span className="break-all block">{msg.text}</span>
+                        <span className="text-[8px] absolute bottom-0 right-1.5">
+                          <MessageTimestamp date={msg.createdAt} />
+                        </span>
+                      </div>
+                    )}
+
+                    {/* For sent messages, show image on the right */}
+                    {isSentByMe && (
+                      <img
+                        src={msg?.senderId?.profile_image || authPlaceHolder}
+                        alt="profile"
+                        className="w-6 h-6 rounded-full"
+                      />
+                    )}
                   </div>
                 );
               })
@@ -136,18 +220,63 @@ const ChatContainer = () => {
           </div>
 
           {/* Input */}
-          <div className="flex items-center gap-2 p-3 border-t border-gray-300 bg-white">
-            <FiPaperclip className="text-gray-600 text-xl cursor-pointer" />
+          <div className="relative flex items-center gap-2 p-3 border-t border-gray-300 bg-white">
+            <input
+              onChange={handleFileChange}
+              type="file"
+              ref={fileRef}
+              hidden
+              accept="image/*"
+            />
+            {base64URL && (
+              <img
+                className=" absolute top-[-132px] left-2  rounded-lg border-gray-300 h-30 w-30 object-cover self-center mt-2 mx-auto"
+                src={base64URL || testPlaceHolder}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = testPlaceHolder;
+                }}
+                alt="Profile"
+              />
+            )}
+            {base64URL && (
+              <div className="cursor-pointer absolute left-[96px] top-[-118px] rounded-full bg-white p-1 hover:bg-gray-300 animate-bounce">
+                <MdOutlineDeleteOutline
+                  className="text-red-500"
+                  size={20}
+                  onClick={() => {
+                    setFile(undefined);
+                    setBase64URL("");
+                    setDisabled(true);
+                  }}
+                />
+              </div>
+            )}
+            <FiPaperclip
+              className="text-gray-600 text-xl cursor-pointer"
+              onClick={() => fileRef.current.click()}
+            />
             <input
               type="text"
               placeholder="Type a message"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                if (e.target.value.trim() === "") {
+                  setDisabled(true);
+                } else {
+                  setDisabled(false);
+                }
+              }}
               onKeyDown={handleKeyDown}
               className="flex-1 px-4 py-2 rounded-full bg-gray-200 focus:outline-none text-sm"
             />
             <FiSend
-              className="text-blue-600 text-xl cursor-pointer"
+              className={` text-xl  ${
+                disabled
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-blue-600 cursor-pointer"
+              }`}
               onClick={handleSend}
             />
           </div>
