@@ -73,7 +73,7 @@ const ProfileForm = ({ className, ...props }) => {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center p-1 ">
       <div
         className={cn(
           "flex flex-col gap-6 justify-center select-none",
@@ -81,7 +81,7 @@ const ProfileForm = ({ className, ...props }) => {
         )}
         {...props}
       >
-        <Card className="overflow-hidden p-0 min-w-lg w-full">
+        <Card className="overflow-hidden p-0 min-w-xs  xs:min-w-sm sm:min-w-md md:min-w-lg w-full">
           <CardContent className="grid p-0 grid-cols-1">
             <form
               className="p-6 md:p-8 w-full mx-auto"

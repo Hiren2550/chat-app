@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 const AboutSection = () => {
   return (
     <div>
-      <div className="bg-muted flex flex-col items-center justify-center p-4 md:p-6">
+      <div className="bg-muted h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-4 md:p-6">
         <h1 className="text-3xl font-bold mb-4 select-none ">About Us</h1>
         <div className="w-full max-w-sm md:max-w-5xl border border-slate-600 rounded-lg bg-white">
           <div className="max-w-4xl sm:mx-auto p-6 space-y-10 text-gray-800">
