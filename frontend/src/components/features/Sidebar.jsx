@@ -93,7 +93,11 @@ const Sidebar = ({ isOpen }) => {
                   {user.fullname}
                 </span>
                 <span className="text-xs text-gray-500 truncate max-w-[140px]">
-                  {onlineUserList?.includes(user.id) ? "Online" : "Offline"}
+                  {onlineUserList?.includes(user.id) ? (
+                    <span className="text-green-400">Online</span>
+                  ) : (
+                    "Offline"
+                  )}
                 </span>
                 <span className="text-sm text-gray-500 truncate max-w-[140px]">
                   {user.lastMessage}

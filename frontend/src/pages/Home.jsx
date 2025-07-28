@@ -2,11 +2,15 @@ import ChatContainer from "@/components/features/ChatContainer";
 import DefaultChat from "@/components/features/DefaultChat";
 import Navbar from "@/components/features/Navbar";
 import Sidebar from "@/components/features/Sidebar";
-import { selectedUser } from "@/redux/user/userSlice";
+import useSocket from "@/hooks/useSocket";
+import { onlineUsers, selectedUser } from "@/redux/user/userSlice";
 import { useSelector } from "react-redux";
 
 const Home = () => {
   const chatUser = useSelector(selectedUser);
+  const onlineUserList = useSelector(onlineUsers);
+  console.log(onlineUserList);
+  const socket = useSocket();
   return (
     <div>
       <Navbar />

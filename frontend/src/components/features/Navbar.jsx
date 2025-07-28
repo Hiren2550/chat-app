@@ -10,6 +10,7 @@ import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/images/logo.png";
+import { disconnectSocket } from "@/lib/socket";
 
 export default function Navbar() {
   const { logOut } = new AuthApi();
@@ -30,6 +31,7 @@ export default function Navbar() {
         if (response.success) {
           toast.success(response?.message ?? "User Logout Successfully");
           dispatch(clearUser());
+          disconnectSocket();
         } else {
           toast.error(response.message ?? "Error While user logout");
         }
