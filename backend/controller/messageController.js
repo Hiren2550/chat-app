@@ -48,7 +48,9 @@ export const createMessage = async (req, res, next) => {
         : {}),
     };
 
-    const newMessage = await Message.create(messageData);
+    let newMessage = await Message.create(messageData);
+    await newMessage.populate("senderId", "-password");
+    await newMessage.populate("receiverId", "-password");
     res.status(201);
     res.locals.data = newMessage;
     res.locals.message = "Message sent successfully";

@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 const Home = () => {
   const chatUser = useSelector(selectedUser);
   const onlineUserList = useSelector(onlineUsers);
-  console.log(onlineUserList);
   const socket = useSocket();
   return (
     <div>

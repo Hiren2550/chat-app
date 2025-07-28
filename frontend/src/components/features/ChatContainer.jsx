@@ -66,7 +66,7 @@ const ChatContainer = () => {
       if (response.success) {
         setBase64URL("");
         setInput("");
-        handleFetchChatMessages(chatUser?.id);
+        setMessages([...messages, response?.data]);
       } else {
         toast.error(response.message ?? "Error While Sending Messages");
       }
@@ -153,6 +153,10 @@ const ChatContainer = () => {
                         src={msg?.senderId?.profile_image || chatPlaceHolder}
                         alt="profile"
                         className="w-6 h-6 rounded-full"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = chatPlaceHolder;
+                        }}
                       />
                     )}
 
@@ -179,6 +183,10 @@ const ChatContainer = () => {
                           src={msg?.image || authPlaceHolder}
                           alt="profile"
                           className="w-[150px] h-[150px] rounded-lg"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = authPlaceHolder;
+                          }}
                         />
                         <span className="text-[8px] absolute bottom-0 right-1.5">
                           <MessageTimestamp date={msg.createdAt} />

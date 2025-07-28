@@ -43,7 +43,7 @@ class MessageApi {
         data
       );
       const res = response?.data;
-      if (res?.status === 200) {
+      if (res?.status === 201) {
         return {
           message: res?.message ?? "Message Sent",
           data: res?.result ?? [],
