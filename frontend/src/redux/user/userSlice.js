@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   selectedUser: {},
-  onlineUserList: ["6884e1ae363544fb040de3c6"],
+  onlineUserList: [],
 };
 
 const userSlice = createSlice({

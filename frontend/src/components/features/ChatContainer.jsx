@@ -68,6 +68,7 @@ const ChatContainer = () => {
       if (response.success) {
         setBase64URL("");
         setInput("");
+        setDisabled(true);
         setMessages((prev) => [...prev, response?.data]);
       } else {
         toast.error(response.message ?? "Error While Sending Messages");

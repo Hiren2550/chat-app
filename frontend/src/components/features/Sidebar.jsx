@@ -18,6 +18,7 @@ const Sidebar = ({ isOpen }) => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const chatUser = useSelector(selectedUser);
+  const selectUser = useSelector(selectedUser);
   const onlineUserList = useSelector(onlineUsers);
 
   const fetchUserList = async () => {
@@ -26,6 +27,9 @@ const Sidebar = ({ isOpen }) => {
       const response = await getUsersList();
       if (response.success) {
         setUsers(response.data);
+        if (!selectUser) {
+          dispatch(setSelectedUser(response?.data?.[0]));
+        }
       } else {
         toast.error(response.message ?? "Error While Fetching Users List");
         const dummyUsers = [
@@ -47,9 +51,8 @@ const Sidebar = ({ isOpen }) => {
 
   return (
     <aside
-      className={`bg-gray-100 border-1 rounded-lg border-gray-300  top-0 left-0 transform ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      } transition-transform duration-300 ease-in-out w-80 z-40 md:translate-x-0 overflow-y-auto h-full hide-scrollbar`}
+      className={`bg-gray-100 border-1 rounded-lg border-gray-300  top-0 left-0 transform
+      transition-transform duration-300 ease-in-out w-80 z-40 md:translate-x-0 overflow-y-auto h-full hide-scrollbar`}
     >
       <div className="p-4 text-xl font-bold border-b border-gray-300 flex gap-2 items-center">
         <PiUserListLight size={30} className="font-bold" />
