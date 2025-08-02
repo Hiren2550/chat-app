@@ -1,3 +1,4 @@
+import { getReceiverSoketId, io } from "../lib/socket.js";
 import Message from "../models/message.js";
 import CustomError from "../utils/CustomErrorHandler.js";
 
@@ -49,8 +50,13 @@ export const createMessage = async (req, res, next) => {
     };
 
     let newMessage = await Message.create(messageData);
+
     await newMessage.populate("senderId", "-password");
     await newMessage.populate("receiverId", "-password");
+    const receiverSocketId = getReceiverSoketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit(`message-${receiverId}`, newMessage);
+    }
     res.status(201);
     res.locals.data = newMessage;
     res.locals.message = "Message sent successfully";

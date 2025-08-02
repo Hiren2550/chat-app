@@ -12,11 +12,13 @@ import moment from "moment";
 import { convertToBase64 } from "@/helper/convertToBase64";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { MessageTimestamp } from "./MessageTimestamp";
+import useSocket from "@/hooks/useSocket";
 
 const ChatContainer = () => {
   const { getMessageByUserId, sendMesssage } = new MessageApi();
   const chatUser = useSelector(selectedUser);
   const authUser = useSelector(user);
+  const socket = useSocket();
   const authPlaceHolder = `https://placehold.co/800x800?text=${authUser?.fullname
     .charAt(0)
     .toUpperCase()}`;
@@ -60,23 +62,22 @@ const ChatContainer = () => {
     if (base64URL) {
       messageData.image = base64URL;
     }
-    setIsLoading(true);
+    // setIsLoading(true);
     try {
       const response = await sendMesssage(messageData);
       if (response.success) {
         setBase64URL("");
         setInput("");
-        setMessages([...messages, response?.data]);
+        setMessages((prev) => [...prev, response?.data]);
       } else {
         toast.error(response.message ?? "Error While Sending Messages");
       }
     } catch (error) {
       toast.error(error?.message ?? "Error while Sending Messages");
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -89,16 +90,36 @@ const ChatContainer = () => {
     convertToBase64(imageFile, setBase64URL);
     setDisabled(false);
   };
+  const handleReceiveMessage = (newMsg) => {
+    const isRelevant =
+      (newMsg.senderId.id === authUser.id &&
+        newMsg.receiverId.id === chatUser.id) ||
+      (newMsg.receiverId.id === authUser.id &&
+        newMsg.senderId.id === chatUser.id);
+
+    if (isRelevant) {
+      setMessages((prev) => [...prev, newMsg]);
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
-    if (chatUser) {
-      handleFetchChatMessages(chatUser?.id);
-    }
+    if (!chatUser) return;
+    handleFetchChatMessages(chatUser.id);
   }, [chatUser]);
+  useEffect(() => {
+    if (!socket || !chatUser) return;
+
+    const eventName = `message-${authUser.id}`;
+    socket.on(eventName, handleReceiveMessage);
+
+    return () => {
+      socket.off(eventName, handleReceiveMessage);
+    };
+  }, [socket, chatUser, handleReceiveMessage]);
 
   return (
     <>
