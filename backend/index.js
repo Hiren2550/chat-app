@@ -21,30 +21,33 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, // Frontend URL (Vite default)
-    credentials: true, // If you use cookies/auth
+    origin: process.env.CLIENT_URL, // Frontend URL
+    credentials: true,
   })
 );
-app.use(express.static(path.join(__dirname, "frontend/dist")));
-// === Log each incoming request ===
+// Logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
 });
 
-// API endpoints
+// API routes
 app.use("/api", routes);
-// ✅ Serve static files from frontend/dist
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// ✅ Catch-all route to serve React app (for client-side routing)
+// ✅ Serve frontend static files (React build)
+app.use(express.static(path.join(__dirname, "../frontend/dist"))); // For Vite
+// OR: use "../frontend/build" if CRA
 
-// Error handling middleware
-app.use(errorHandler);
+// ✅ SPA fallback route for React Router
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html")); // or build/
 });
+
+// Error handling middleware (after routes)
+app.use(errorHandler);
+
+// Start server
 server.listen(port, async () => {
   await connectDB();
-  console.log(`Server is running on port ${port}... ��`);
+  console.log(`Server is running on port ${port}... 🚀`);
 });
